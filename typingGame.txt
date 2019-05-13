@@ -1,0 +1,85 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <windows.h>
+#include <stdio.h>
+#include <conio.h>
+
+using namespace std;
+
+int score = 0;
+const int mapWidth = 40, mapHeight = 20;
+
+void drawMap(char letter)
+{
+    srand(time(NULL));
+    int X = rand() % (mapWidth-1) + 1;
+    int Y = rand() % (mapHeight-1) + 1;
+    for (int j = 0; j <= mapHeight; j++)
+    {
+        if (j == 0 || j == mapHeight)
+        {
+            for (int i = 0; i <= mapWidth; i++ )
+            {
+                cout<<char(127);
+            }
+        }
+        else
+            for (int i = 0; i <= mapWidth; i++ )
+            {
+                if (i == 0 || i == mapWidth)
+                {
+                    cout<<char(127);
+                }
+                else
+                    if (j == Y && i == X)
+                    {
+                        cout<<letter;
+                    }
+                    else
+                        cout<<" ";
+            }
+
+        cout<<endl;
+    }
+
+}
+
+char randomLetter()
+{
+    srand(time(NULL));
+    char letters[] = "abcdefghijklmnopqrstuvwxyz";
+    char x = letters[rand() % 26];
+    return x;
+}
+
+void drawScore()
+{
+    cout<<"\n\t\t"<<"Score: "<<endl;
+    cout<<"\t\t"<<score;
+}
+
+int main()
+{
+    while(1)
+    {
+        char a = randomLetter();
+        drawMap(a);
+        drawScore();
+
+        char ch;
+
+        while (a != ch)
+        {
+            ch = _getch();
+            Beep(1222,100);
+
+        }
+        Beep(523,500);
+        score ++;
+        cout<<endl;
+        system("cls");
+        Sleep(10);
+
+    }
+}
