@@ -1,0 +1,196 @@
+#include <iostream>
+#include <Windows.h>
+#include <conio.h>
+#include <chrono>
+#include <algorithm> 
+#include <string>
+
+int currentLetter;
+int wordCount;
+int gameCount = 0;
+std::string sentence;
+bool sentenceOver;
+bool customSentence = 0;
+float CPM;
+auto start = std::chrono::high_resolution_clock::now();
+auto end = std::chrono::high_resolution_clock::now();
+std::chrono::duration<float> duration = end - start;
+int scoreTable[10];
+void typeracer();
+void menu();
+void options();
+
+void saveScore(int games, int charminute)
+{
+	scoreTable[games - 1] = charminute;
+}
+
+void pressBack()
+{
+	while (1)
+	{
+	if (_kbhit())
+	{
+		if (_getch() == 27)
+		{
+			menu();
+		}
+	}
+	}
+}
+
+void options()
+{
+	system("cls");
+	std::cout << "\t\t\tType in custom text for the test: " << std::endl;
+	std::getline(std::cin, sentence);
+	customSentence = 1;
+	pressBack();
+}
+
+void scores()
+{
+	system("cls");
+	std::sort(scoreTable, scoreTable + 10);
+	std::cout << "\t\t\tYour best scores this session were: " << std::endl;
+	for (int i = 9, j = 1; i <= 0, j <= 10; i--, j++)
+	{
+		std::cout << "\t\t\t" << j << ". " << scoreTable[i] << " WPM" << std::endl;
+	}
+	pressBack();
+}
+
+void menu()
+{
+	system("cls");
+	std::cout << "\n\t\t\t[s]tart" << std::endl;
+	std::cout << "\t\t\t[o]ptions" << std::endl;
+	std::cout << "\t\t\t[b]est scores" << std::endl;
+	std::cout << "\t\t\t[e]xit" << std::endl;
+	while (1)
+	{
+		if (_kbhit() != 13)
+		{
+			switch (_getch())
+			{
+			case 's':
+				typeracer();
+				break;
+			case 'o':
+				options();
+				break;
+			case 'b':
+				scores();
+			case 'e':
+				exit(1);
+			}
+		}
+	}
+}
+
+void setup()
+{
+	sentenceOver = false;
+	currentLetter = 0;
+	CPM = 0;
+	wordCount = 0;
+	gameCount++;
+	if (!customSentence)
+	{
+		sentence = "This is a sample text to test your typing speed, you can change this text by typing your own in options.";
+	}
+}
+
+void gotoxy(int x, int y)
+{
+	COORD c;
+	c.X = x;
+	c.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+}
+
+
+void letterCheck(char let)
+{
+	if (let == sentence.at(currentLetter))
+	{
+		gotoxy(currentLetter, 10);
+		std::cout << let;
+		wordCount++;
+		currentLetter++;
+	}
+	else
+		system("color 4");
+		system("color 7");
+
+	if (currentLetter == sentence.length())
+	{
+		end = std::chrono::high_resolution_clock::now();
+		sentenceOver = true;
+	}
+}
+
+void scoreScreen()
+{
+	std::chrono::duration<float> duration = end - start;
+	float time = duration.count();
+	CPM = wordCount * (60.0f / time);
+	CPM = int(CPM);
+	saveScore(gameCount, CPM);
+	system("cls");
+	gotoxy(0, 10);
+	std::cout << "You typed " << wordCount << " characters in the time of " << time << " seconds!"<<std::endl;
+	std::cout << "This means that your CPM was: " << CPM <<"\n\n\n\n\n\n";
+	std::cout << "Do you want to try [a]gain or go back to [m]enu?";
+	while (1)
+	{
+		if (_kbhit())
+		{
+			switch (_getch())
+			{
+			case 'a':
+				typeracer();
+				break;
+			case 'm':
+				menu();
+			}
+		}
+		
+	}
+}
+
+void typeracer()
+{
+	setup();
+	system("cls");
+	std::cout << "To start the typing test press space!";
+	while (_getch() != 32) { std::cout << "\nPlease press space!"; }
+	
+		system("cls");
+		std::cout << "\n\n\n\n\n\n" << sentence;
+		for (int i = 3; i >= 0; i--)
+		{
+			Sleep(1000);
+			gotoxy(0, 3);
+			std::cout << "Starting the test in " << i;
+		}
+		gotoxy(0, 4);
+		std::cout << "GO! GO! GO! GO!";
+
+	start = std::chrono::high_resolution_clock::now();
+
+	while (!sentenceOver)
+	{
+		if (_kbhit())
+		{
+			letterCheck(_getch());
+		}
+		
+	}
+	scoreScreen();
+}
+
+int main()
+{
+	menu();
+}
